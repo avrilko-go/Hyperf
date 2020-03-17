@@ -56,6 +56,8 @@ class BackendAuthMiddleware implements MiddlewareInterface
         $authName = AuthInit::get($routeName);
         if (empty($authName)) { // 没有设置权限代表所有用户都可以访问
             return $handler->handle($request);
+        } else {
+            $authName = $authName['authName'];
         }
 
         // 判断用户是否为admin

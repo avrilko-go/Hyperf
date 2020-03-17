@@ -11,11 +11,12 @@ class AuthInit
     private static $authMap = [];
 
 
-    public static function addAuth(string $routeName, string $authName, string $moduleName) :void
+    public static function addAuth(string $routeName, string $authName, string $moduleName, bool $hidden) :void
     {
         self::$authMap[$routeName] = [
             'authName' => $authName,
-            'moduleName' => $moduleName
+            'moduleName' => $moduleName,
+            'hidden' => $hidden
         ];
     }
 
@@ -53,10 +54,36 @@ class AuthInit
      *
      * @return string
      */
-    public static function makeKey(string $class, string $method)
+    public static function makeKey(string $class, string $method):string
     {
         $routeName = array_slice(explode('\\',$class),2); // 截取掉前面App\Controller提高性能
         array_push($routeName, $method);
         return implode("@", $routeName);
     }
+
+    /**
+     * 获取前端显示的权限列表
+     *
+     * @return array
+     */
+    public static function geAuthList() :array
+    {
+        $map = self::getAuth();
+        $authList = [];
+        foreach ($map as $key => $value) {
+            $authName = $value['authName'];
+            $moduleName = $value['moduleName'];
+            $hidden = $value['hidden'];
+            if (!$hidden) { // 隐藏的不显示在权限列表中
+                if (!isset($authList[$moduleName])) {
+                    $authList[$moduleName] = [];
+                }
+                $authList[$moduleName][$authName] = [""];
+            }
+        }
+
+        return $authList;
+    }
+
+
 }

@@ -18,10 +18,12 @@ class Auth extends AbstractAnnotation
 
     public $module;
 
+    public $hidden = false;
+
     public function collectMethod(string $className, ?string $target): void
     {
         $routeName = AuthInit::makeKey($className, $target);
-        AuthInit::addAuth($routeName,$this->auth, $this->module);
+        AuthInit::addAuth($routeName,$this->auth, $this->module, $this->hidden);
         AnnotationCollector::collectMethod($className, $target, static::class, $this);
     }
 }

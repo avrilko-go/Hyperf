@@ -34,7 +34,7 @@ class LogController extends AbstractController
      *     @Middleware(App\Middleware\BackendAuthMiddleware::class)
      * })
      * @GetMapping(path="users")
-     * @Auth(module="日志",auth="获取日志记录用户名")
+     * @Auth(module="日志",auth="查询日志记录的用户")
      */
     public function getUsers()
     {
@@ -42,6 +42,7 @@ class LogController extends AbstractController
     }
 
     /**
+     * @Auth(module="日志",auth="查询所有日志")
      * @GetMapping(path="")
      */
     public function getLogs()
@@ -50,6 +51,7 @@ class LogController extends AbstractController
     }
 
     /**
+     * @Auth(module="日志",auth="搜索日志")
      * @GetMapping(path="search")
      */
     public function getUserLogs()
