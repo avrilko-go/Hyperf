@@ -36,7 +36,8 @@
         "hyperf/redis": "~1.1.0",
         "hyperf/utils": "~1.1.0",
       "ext-json": "*",
-        "hyperf/validation": "^1.1"
+        "hyperf/validation": "^1.1",
+        "firebase/php-jwt": "^5.1"
     },
     "require-dev": {
         "swoft/swoole-ide-helper": "^4.2",

@@ -20,12 +20,8 @@ class Auth extends AbstractAnnotation
 
     public function collectMethod(string $className, ?string $target): void
     {
-        $routeName = array_slice(explode('\\',$className),2); // 截取掉前面App\Controller提高性能
-        array_push($routeName, $target);
-        $routeName = implode("@", $routeName);
-
+        $routeName = AuthInit::makeKey($className, $target);
         AuthInit::addAuth($routeName,$this->auth, $this->module);
-
         AnnotationCollector::collectMethod($className, $target, static::class, $this);
     }
 }

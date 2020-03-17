@@ -10,7 +10,7 @@ class UserException extends BaseException
 {
     public $code = 404;
 
-    public $message = "账户不存在";
+    public $msg = "账户不存在";
 
     public $errorCode = 10020;
 }

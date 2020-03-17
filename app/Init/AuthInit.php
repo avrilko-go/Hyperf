@@ -28,4 +28,35 @@ class AuthInit
     {
         return self::$authMap;
     }
+
+    /**
+     *  获取权限内容
+     *
+     * @param string $key
+     *
+     * @return array
+     */
+    public static function get(string $key) :array
+    {
+        if (isset(self::$authMap[$key])) {
+            return self::$authMap[$key];
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * 按规则生成key
+     *
+     * @param string $class
+     * @param string $method
+     *
+     * @return string
+     */
+    public static function makeKey(string $class, string $method)
+    {
+        $routeName = array_slice(explode('\\',$class),2); // 截取掉前面App\Controller提高性能
+        array_push($routeName, $method);
+        return implode("@", $routeName);
+    }
 }

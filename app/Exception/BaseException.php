@@ -12,7 +12,7 @@ class BaseException extends \Exception
     public $code = 400;
 
     // 错误信息
-    public $message = "参数错误";
+    public $msg = "参数错误";
 
     // 错误码
     public $errorCode = 10000;
@@ -23,8 +23,8 @@ class BaseException extends \Exception
             $this->code = (int)$params['code'];
         }
 
-        if (isset($params['message'])) {
-            $this->message = (string)$params['message'];
+        if (isset($params['msg'])) {
+            $this->msg = (string)$params['msg'];
         }
 
         if (isset($params['errorCode'])) {

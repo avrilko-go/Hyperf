@@ -19,8 +19,8 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Validation\ValidationException;
-use Psr\Http\Message\ResponseInterface;
 use Throwable;
+use Psr\Http\Message\ResponseInterface;
 
 class AppExceptionHandler extends ExceptionHandler
 {
@@ -40,21 +40,21 @@ class AppExceptionHandler extends ExceptionHandler
         if ($throwable instanceof BaseException) { // 自定义的异常错误
             $data = [
                 'error_code' => $throwable->errorCode,
-                'message' => $throwable->message
+                'msg' => $throwable->msg
             ];
             $data = json_encode($data, JSON_UNESCAPED_UNICODE); // 不转义中文
             return $response->withStatus($throwable->code)->withHeader("Content-Type","application/json")->withBody(new SwooleStream($data));
         } elseif ($throwable instanceof ValidationException) { // 验证器的报错
-            $message = "参数验证不通过 ===> ";
+            $msg = "参数验证不通过 ===> ";
             foreach ($throwable->errors() as $error) {
                 foreach ($error as $e) {
-                    $message.= "{$e} ";
+                    $msg.= "{$e} ";
                 }
             }
 
             $data = [
                 'error_code' => 20000,
-                'message' => $message
+                'msg' => $msg
             ];
             $data = json_encode($data, JSON_UNESCAPED_UNICODE); // 不转义中文
             return $response->withStatus(400)->withHeader("Content-Type","application/json")->withBody(new SwooleStream($data));
