@@ -28,6 +28,7 @@ class CorsMiddleware implements MiddlewareInterface
         $response = Context::get(ResponseInterface::class); // 在容器中拿出response
         $response = $response->withHeader('Access-Control-Allow-Origin', '*')
             ->withHeader('Access-Control-Allow-Credentials', 'true')
+            ->withHeader('Access-Control-Allow-Methods', 'POST,GET,PUT,DELETE,OPTIONS')
             // Headers 可以根据实际情况进行改写。
             ->withHeader('Access-Control-Allow-Headers', 'DNT,Keep-Alive,User-Agent,Cache-Control,Content-Type,Authorization');
 

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Annotation;
 
 use App\Init\AuthInit;
+use App\Model\Cms\LinPermission;
 use Hyperf\Di\Annotation\AbstractAnnotation;
 use Hyperf\Di\Annotation\AnnotationCollector;
+use Hyperf\Di\Annotation\Inject;
 
 /**
  * @Annotation
@@ -19,6 +21,12 @@ class Auth extends AbstractAnnotation
     public $module;
 
     public $hidden = false;
+
+    /**
+     * @Inject()
+     * @var LinPermission
+     */
+    private $permission;
 
     public function collectMethod(string $className, ?string $target): void
     {

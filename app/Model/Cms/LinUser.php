@@ -6,8 +6,6 @@ namespace App\Model\Cms;
 
 use App\Exception\Cms\UserException;
 use App\Model\Model;
-use App\Util\Util;
-use Hyperf\Database\Model\ModelNotFoundException;
 use Hyperf\Di\Annotation\Inject;
 
 class LinUser extends Model
@@ -31,7 +29,7 @@ class LinUser extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['username', 'nickname', 'email', 'avatar'];
 
     /**
      * The attributes that should be cast to native types.
@@ -48,43 +46,26 @@ class LinUser extends Model
 
     /**
      * @Inject()
-     * @var LinAuth
+     * @var LinPermission
      */
-    private $auth;
+    private $permissions;
 
     /**
-     * 检测密码是否正确
-     *
-     * @param string $username
-     * @param string $password
-     * @return object
-     *
-     * @throws UserException
+     * @Inject()
+     * @var LinUserGroup
      */
-    public function verify(string $username, string $password) :object
-    {
-        try {
-            $user = $this->query()->where('username', $username)->firstOrFail();
-        } catch (ModelNotFoundException $exception) {
-            throw new UserException();
-        }
+    private $userGroup;
 
-        if (!$user->active) {
-            throw new UserException([
-                'code' => 400,
-                'msg' => '账户已被禁用，请联系管理员',
-                'errorCode' => 10070
-            ]);
-        }
-        if (!$this->checkPassword($password, $user->password)) {
-            throw new UserException([
-                'code' => 400,
-                'msg' => '密码错误，请重新输入',
-                'errorCode' => 10030
-            ]);
-        }
-        return $user->setHidden(['password']);
-    }
+    /**
+     * @Inject()
+     * @var LinGroupPermission
+     */
+    private $groupPermission;
+
+    const CREATED_AT = 'create_time';
+
+    const UPDATED_AT = 'update_time';
+
 
     /**
      * 检查密码
@@ -96,7 +77,6 @@ class LinUser extends Model
      */
     public function checkPassword(string $rawPassword, string $password) :bool
     {
-        var_dump(md5($rawPassword.config('mode.app_key')));
         return md5($rawPassword.config('mode.app_key')) === $password;
     }
 
@@ -108,26 +88,75 @@ class LinUser extends Model
      * @return array
      * @throws UserException
      */
-    public function getUserByUID($uid) :array
+    public function getUserInfo($uid) :array
     {
-        try {
-            $user = $this->query()->findOrFail($uid)->setHidden(['password'])->toArray();
-        } catch (\Exception $ex) {
-            throw new UserException();
+        $user = $this->getUserById($uid)->setHidden(['create_time', 'update_time', 'delete_time', 'username'])->toArray();
+        // 查询用户所有的权限组
+        $groupIds = $this->userGroup->query()->where('user_id', $user['id'])->get()->pluck('group_id')->toArray();
+        $superAdmin = $this->group->query()->whereIn('id', $groupIds)->where('name', 'admin')->first()->toArray();
+        $permissions = [];
+        if (!empty($superAdmin)) { // 该用户拥有超级管理员的权限（直接查询所有权限返回）
+            $user['admin'] = true;
+            $permissions = $this->permissions->query()->get()->toArray();
+        } else { //不是则要先查询出这些分组下有多少权限id
+            $user['admin'] = false;
+            $permissionIds = $this->groupPermission->query()->whereIn('group_id', $groupIds)->get()->pluck('pluck')->toArray();
+            if (!empty($permissionIds)) {
+                $permissions = $this->permissions->query()->whereIn('id', $permissionIds)->get()->toArray();
+            }
         }
 
-        $groupName = '';
-        if (!empty($user['group_id'])) {
-            $group = $this->group->query()->where('id', $user['group_id'])->select(['name'])->find();
-            $groupName = $group['name'];
-        }
-        $user['group_name'] = $groupName;
-
-        $auths = $this->auth->getAuthByGroupID($user['group_id']);
-        $auths = empty($auths) ? [] : Util::splitModules($auths);
-        $user['auths'] = $auths;
+        $user['permissions'] = $this->permissions->formatPermission($permissions);
 
         return $user;
     }
 
+    /**
+     * 通过user_id 获取数据
+     *
+     * @param int $id
+     *
+     * @return LinUser
+     * @throws UserException
+     */
+    public function getUserById(int $id) :LinUser
+    {
+        try {
+            $user = $this->query()->findOrFail($id);
+        } catch (\Exception $ex) {
+            throw new UserException();
+        }
+
+        return $user;
+    }
+
+    /**
+     * 添加用户
+     *
+     * @param array $params
+     */
+    public function addUser(array $params)
+    {
+        $insertData = [
+            'username' => $params['username'],
+            'email' => $params['email'],
+        ];
+        $user = $this->create($insertData);
+
+        LinUserIdentity::create([
+            'user_id' => $user->id,
+            'identity_type' => LinUserIdentity::TYPE_LOGIN_USERNAME,
+            'identifier' => $params['username'],
+            'credential' => md5($params['password']. config('mode.app_key'))
+        ]);
+
+        if (!empty($params['group_ids'])) {
+            foreach ($params['group_ids'] as $group_id) {
+                $this->userGroup->create([
+                    'user_id' => $user->id,
+                    'group_id' => $group_id
+                ]);
+            }
+        }
+    }
 }

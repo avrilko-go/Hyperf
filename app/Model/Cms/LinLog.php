@@ -28,7 +28,7 @@ class LinLog extends Model
      *
      * @var array
      */
-    protected $fillable = ['message', 'user_id', 'user_name', 'status_code', 'method', 'path'];
+    protected $fillable = ['message', 'user_id', 'username', 'status_code', 'method', 'path'];
 
     /**
      * The attributes that should be cast to native types.
@@ -37,33 +37,65 @@ class LinLog extends Model
      */
     protected $casts = [];
 
+    const CREATED_AT = 'create_time';
+
+    const UPDATED_AT = 'update_time';
+
     /**
-     * 日志列表
+ * 日志列表
+ *
+ * @param $params
+ *
+ * @return array
+ * @throws \App\Exception\Cms\ParameterException
+ */
+    public function getLogs($params) :array
+    {
+        $filter = [];
+        if (isset($params['name']) && !empty($params['name'])) {
+            $filter ['username'] = $params['name'];
+        }
+
+        list($start, $count) = $this->paginate();
+
+        $logs = $this->query()->select(['username', 'message'])->selectRaw('create_time as time')->where($filter);
+        if (isset($params['start']) && isset($params['end'])) {
+            $logs->whereBetween('create_time', [$params['start'], $params['end']]);
+        }
+        if (isset($params['keyword']) && !empty($params['keyword'])) {
+            $logs->where('message', 'like', "{$params['keyword']}%");
+        }
+
+        $totalNums = $logs->count();
+        $logs = $logs->offset($start)->limit($count)->orderByDesc('create_time')->get();
+
+        $result = [
+            'items' => $logs,
+            'total' => $totalNums,
+            'count' => $count,
+            'page' => $this->request->query('page'),
+            'total_page' => ceil($totalNums / $count)
+        ];
+        return $result;
+    }
+
+
+    /**
+     * 人员列表
      *
      * @param $params
      *
      * @return array
      * @throws \App\Exception\Cms\ParameterException
      */
-    public function getLogs($params) :array
+    public function getUsers($params) :array
     {
-        $filter = [];
-        if (isset($params['name'])) {
-            $filter ['user_name'] = $params['name'];
-        }
-
         list($start, $count) = $this->paginate();
 
-        $logs = $this->query()->select(['user_name', 'message'])->selectRaw('created_at as time')->where($filter);
-        if (isset($params['start']) && isset($params['end'])) {
-            $logs->whereBetween('created_at', [$params['start'], $params['end']]);
-        }
-        if (isset($params['keyword'])) {
-            $logs->where('message', 'like', "{$params['keyword']}%");
-        }
+        $logs = $this->query()->select(['username']);
 
         $totalNums = $logs->count();
-        $logs = $logs->offset($start)->limit($count)->orderByDesc('created_at')->get();
+        $logs = $logs->offset($start)->limit($count)->get()->unique()->pluck('username');
 
         $result = [
             'items' => $logs,

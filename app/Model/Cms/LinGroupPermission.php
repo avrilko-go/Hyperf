@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace App\Model\Cms;
 
-
+use App\Exception\Cms\UserException;
 use App\Model\Model;
+use Hyperf\Database\Model\ModelNotFoundException;
+use Hyperf\DbConnection\Db;
+use Hyperf\Di\Annotation\Inject;
 
-class LinAuth extends Model
+class LinGroupPermission extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'lin_auth';
+    protected $table = 'lin_group_permission';
 
     /**
      * The connection name for the model.
@@ -28,7 +31,9 @@ class LinAuth extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['group_id', 'permission_id'];
+
+    public $timestamps = false;
 
     /**
      * The attributes that should be cast to native types.
@@ -37,16 +42,9 @@ class LinAuth extends Model
      */
     protected $casts = [];
 
-    /**
-     * 获取当前权限组下面的所有权限
-     *
-     * @param int $id
-     *
-     * @return array
-     */
-    public function getAuthByGroupID(int $id)
-    {
-        return $this->query()->where('group_id', $id)->get()->toArray();
-    }
+    const CREATED_AT = 'create_time';
+
+    const UPDATED_AT = 'update_time';
+
 
 }

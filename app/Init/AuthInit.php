@@ -3,20 +3,24 @@ declare(strict_types=1);
 
 namespace App\Init;
 
+use App\Model\Cms\LinPermission;
+
 class AuthInit
 {
+    private static $init = false;
+
     /**
      * @var array 权限初始化map key为类名称@方法名  value为权限
      */
     private static $authMap = [];
-
 
     public static function addAuth(string $routeName, string $authName, string $moduleName, bool $hidden) :void
     {
         self::$authMap[$routeName] = [
             'authName' => $authName,
             'moduleName' => $moduleName,
-            'hidden' => $hidden
+            'hidden' => $hidden,
+            'id' => 0
         ];
     }
 
@@ -78,12 +82,39 @@ class AuthInit
                 if (!isset($authList[$moduleName])) {
                     $authList[$moduleName] = [];
                 }
-                $authList[$moduleName][$authName] = [""];
+                $authList[$moduleName][] = [
+                    'name' => $authName,
+                    'module' => $moduleName,
+                    'id' => (int)$value['id']
+                ];
             }
         }
-
         return $authList;
     }
 
+    /**
+     * 初始化权限数据
+     */
+    public static function initData()
+    {
+        $map = self::getAuth();
+        foreach ($map as $key => $item) {
+            $id = LinPermission::addData($item);
+            $item['id'] = $id;
+            $map[$key] = $item;
+        }
 
+        self::$authMap = $map;
+        self::$init = true;
+    }
+
+    /**
+     * 是否已经准备好数据
+     *
+     * @return bool
+     */
+    public static function idReady() :bool
+    {
+        return self::$init === true;
+    }
 }

@@ -38,7 +38,7 @@ class LogController extends AbstractController
      */
     public function getUsers()
     {
-        return $this->log->query()->pluck('user_name')->unique();
+        return $this->log->getUsers($this->request->query());
     }
 
     /**

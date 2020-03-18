@@ -50,30 +50,31 @@ class BackendAuthMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $dispatch = $this->request->getAttribute(Dispatched::class);
-        list($class,$method) = $dispatch->handler->callback;
-        $routeName = AuthInit::makeKey($class, $method);
-        $authName = AuthInit::get($routeName);
-        if (empty($authName)) { // 没有设置权限代表所有用户都可以访问
-            return $handler->handle($request);
-        } else {
-            $authName = $authName['authName'];
-        }
-
-        // 判断用户是否为admin
-        $user = $this->token->userAuth();
-        if ($user['admin'] == 2) { // 超级管理员拥有一切权限
-            return $handler->handle($request);
-        }
-
-        $authList = $this->recursiveForeach($user['auths']);
-        // 判断接口权限是否在账户拥有权限数组内
-        $allowable = in_array($authName, $authList) ? true : false;
-        if (in_array($authName, $authList)) {
-            return $handler->handle($request);
-        }
-
-        throw new ForbiddenException();
+        return $handler->handle($request);
+//        $dispatch = $this->request->getAttribute(Dispatched::class);
+//        list($class,$method) = $dispatch->handler->callback;
+//        $routeName = AuthInit::makeKey($class, $method);
+//        $authName = AuthInit::get($routeName);
+//        if (empty($authName)) { // 没有设置权限代表所有用户都可以访问
+//            return $handler->handle($request);
+//        } else {
+//            $authName = $authName['authName'];
+//        }
+//
+//        // 判断用户是否为admin
+//        $user = $this->token->userAuth();
+//        if ($user['admin'] == 2) { // 超级管理员拥有一切权限
+//            return $handler->handle($request);
+//        }
+//
+//        $authList = $this->recursiveForeach($user['auths']);
+//        // 判断接口权限是否在账户拥有权限数组内
+//        $allowable = in_array($authName, $authList) ? true : false;
+//        if (in_array($authName, $authList)) {
+//            return $handler->handle($request);
+//        }
+//
+//        throw new ForbiddenException();
     }
 
     /**

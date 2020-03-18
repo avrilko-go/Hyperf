@@ -11,10 +11,12 @@ declare(strict_types=1);
  */
 
 use App\Middleware\CorsMiddleware;
+use App\Middleware\PermissionMiddleware;
 use Hyperf\Validation\Middleware\ValidationMiddleware;
 
 return [
     'http' => [
+        PermissionMiddleware::class, // 这个一定要放在最外层，包含权限初始化
         ValidationMiddleware::class,
         CorsMiddleware::class
     ],

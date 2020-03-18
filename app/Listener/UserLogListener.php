@@ -73,10 +73,11 @@ class UserLogListener implements ListenerInterface
             $message = $data;
         }
 
+        var_dump($data);
         $insertData = [
             'message' => $username . $message,
             'user_id' => $uid,
-            'user_name' => $username,
+            'username' => $username,
             'status_code' => $code,
             'method' => $this->request->getMethod(),
             'path' => $this->request->getPathInfo(),
