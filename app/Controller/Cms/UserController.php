@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Cms;
 
+use App\Annotation\Auth;
 use App\Controller\AbstractController;
 use App\Event\UserLog;
 use App\Model\Cms\LinUser;
@@ -13,11 +14,17 @@ use App\Service\TokenService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Annotation\Middleware;
+use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\PostMapping;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * @Middlewares({
+ *     @Middleware(App\Middleware\BackendAuthMiddleware::class)
+ *  })
+ *
  * @Controller(prefix="/cms/user")
  */
 class UserController extends AbstractController
@@ -59,6 +66,7 @@ class UserController extends AbstractController
     }
 
     /**
+     * @Auth(auth="获取自己的权限信息",login=true,hidden=true,module="必备开启权限")
      * @GetMapping(path="permissions")
      */
     public function getAllowedApis()
@@ -68,6 +76,7 @@ class UserController extends AbstractController
     }
 
     /**
+     * @Auth(auth="添加一个角色",login=true,hidden=true,module="管理员")
      * @PostMapping(path="register")
      */
     public function register()

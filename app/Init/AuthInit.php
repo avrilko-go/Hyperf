@@ -14,13 +14,14 @@ class AuthInit
      */
     private static $authMap = [];
 
-    public static function addAuth(string $routeName, string $authName, string $moduleName, bool $hidden) :void
+    public static function addAuth(string $routeName, string $authName, string $moduleName, bool $hidden, bool $login) :void
     {
         self::$authMap[$routeName] = [
             'authName' => $authName,
             'moduleName' => $moduleName,
             'hidden' => $hidden,
-            'id' => 0
+            'login' => $login,
+            'id' => 0,
         ];
     }
 

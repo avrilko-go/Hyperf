@@ -22,6 +22,8 @@ class Auth extends AbstractAnnotation
 
     public $hidden = false;
 
+    public $login = false;
+
     /**
      * @Inject()
      * @var LinPermission
@@ -31,7 +33,7 @@ class Auth extends AbstractAnnotation
     public function collectMethod(string $className, ?string $target): void
     {
         $routeName = AuthInit::makeKey($className, $target);
-        AuthInit::addAuth($routeName,$this->auth, $this->module, $this->hidden);
+        AuthInit::addAuth($routeName,$this->auth, $this->module, $this->hidden, $this->login);
         AnnotationCollector::collectMethod($className, $target, static::class, $this);
     }
 }

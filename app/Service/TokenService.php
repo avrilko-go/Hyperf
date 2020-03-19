@@ -150,21 +150,4 @@ class TokenService
         }
     }
 
-    /**
-     * 获取用户权限相关信息
-     *
-     * @return array
-     *
-     * @throws TokenException
-     * @throws \App\Exception\Cms\UserException
-     */
-    public function userAuth():array
-    {
-        $uid = $this->getCurrentUID();
-        $user = $this->user->getUserByUID($uid);
-
-        return $user;
-    }
-
-
 }

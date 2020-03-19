@@ -13,8 +13,6 @@ use App\Model\Cms\LinLog;
 use App\Model\Cms\LinUser;
 use App\Model\Cms\LinUserGroup;
 use App\Model\Cms\LinUserIdentity;
-use App\Request\Cms\UserRequest;
-use App\Service\TokenService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -23,10 +21,12 @@ use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\PostMapping;
 use Hyperf\HttpServer\Annotation\PutMapping;
-use Hyperf\HttpServer\Contract\ResponseInterface;
-use TheSeer\Tokenizer\Token;
 
 /**
+ * @Middlewares({
+ *  @Middleware(App\Middleware\BackendAuthMiddleware::class)
+ * })
+ *
  * @Controller(prefix="/cms/admin")
  */
 class AdminController extends AbstractController
@@ -68,6 +68,7 @@ class AdminController extends AbstractController
     private $userIdentity;
 
     /**
+     * @Auth(auth="获取所有分组信息",module="管理员",login=true,hidden=true)
      * @GetMapping(path="group/all")
      */
     public function getGroupAll()
@@ -76,6 +77,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="获取所有权限内容",module="管理员",login=true,hidden=true)
      * @GetMapping(path="permission")
      */
     public function authority()
@@ -84,6 +86,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="获取单个分组信息",module="管理员",login=true,hidden=true)
      * @GetMapping(path="group/{id}")
      */
     public function groupInfo(int $id)
@@ -92,6 +95,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="添加组的权限",module="管理员",login=true,hidden=true)
      * @PostMapping(path="permission/dispatch/batch")
      */
     public function batchPermission()
@@ -114,6 +118,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="移除组的权限",module="管理员",login=true,hidden=true)
      * @PostMapping(path="permission/remove")
      */
     public function removePermission()
@@ -130,6 +135,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="添加分组信息",module="管理员",login=true,hidden=true)
      * @PostMapping(path="group")
      */
     public function addGroup()
@@ -147,6 +153,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="删除分组信息",module="管理员",login=true,hidden=true)
      * @DeleteMapping(path="group/{id}")
      */
     public function deleteGroup(int $id)
@@ -171,6 +178,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="修改用户信息",module="管理员",login=true,hidden=true)
      * @PutMapping(path="user/{id}")
      */
     public function storeUser(int $id)
@@ -185,6 +193,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="删除用户信息",module="管理员",login=true,hidden=true)
      * @DeleteMapping(path="user/{id}")
      */
     public function deleteUser(int $id)
@@ -202,6 +211,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Auth(auth="修改用户密码",module="管理员",login=true,hidden=true)
      * @PutMapping(path="user/{id}/password")
      */
     public function password()

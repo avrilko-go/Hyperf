@@ -7,18 +7,16 @@ namespace App\Controller\Cms;
 use App\Annotation\Auth;
 use App\Controller\AbstractController;
 use App\Model\Cms\LinLog;
-use App\Model\Cms\LinUser;
-use App\Request\Cms\UserRequest;
-use App\Service\TokenService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\Middlewares;
-use Hyperf\HttpServer\Annotation\PostMapping;
-use Hyperf\HttpServer\Contract\ResponseInterface;
 
 /**
+ * @Middlewares({
+ *  @Middleware(App\Middleware\BackendAuthMiddleware::class)
+ * })
  * @Controller(prefix="/cms/log")
  */
 class LogController extends AbstractController
@@ -30,11 +28,8 @@ class LogController extends AbstractController
     private $log;
 
     /**
-     * @Middlewares({
-     *     @Middleware(App\Middleware\BackendAuthMiddleware::class)
-     * })
      * @GetMapping(path="users")
-     * @Auth(module="日志",auth="查询日志记录的用户")
+     * @Auth(module="日志",auth="查询日志记录的用户",login=true)
      */
     public function getUsers()
     {
@@ -42,7 +37,7 @@ class LogController extends AbstractController
     }
 
     /**
-     * @Auth(module="日志",auth="查询所有日志")
+     * @Auth(module="日志",auth="查询所有日志",login=true)
      * @GetMapping(path="")
      */
     public function getLogs()
@@ -51,7 +46,7 @@ class LogController extends AbstractController
     }
 
     /**
-     * @Auth(module="日志",auth="搜索日志")
+     * @Auth(module="日志",auth="搜索日志",login=true)
      * @GetMapping(path="search")
      */
     public function getUserLogs()

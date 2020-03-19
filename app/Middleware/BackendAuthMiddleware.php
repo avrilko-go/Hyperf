@@ -6,6 +6,7 @@ namespace App\Middleware;
 
 use App\Exception\Cms\ForbiddenException;
 use App\Init\AuthInit;
+use App\Model\Cms\LinUser;
 use App\Service\TokenService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Router\Dispatched;
@@ -41,6 +42,12 @@ class BackendAuthMiddleware implements MiddlewareInterface
      */
     private $token;
 
+    /**
+     * @Inject()
+     * @var LinUser
+     */
+    private $user;
+
     public function __construct(ContainerInterface $container, HttpResponse $response, RequestInterface $request)
     {
         $this->container = $container;
@@ -50,31 +57,28 @@ class BackendAuthMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return $handler->handle($request);
-//        $dispatch = $this->request->getAttribute(Dispatched::class);
-//        list($class,$method) = $dispatch->handler->callback;
-//        $routeName = AuthInit::makeKey($class, $method);
-//        $authName = AuthInit::get($routeName);
-//        if (empty($authName)) { // 没有设置权限代表所有用户都可以访问
-//            return $handler->handle($request);
-//        } else {
-//            $authName = $authName['authName'];
-//        }
-//
-//        // 判断用户是否为admin
-//        $user = $this->token->userAuth();
-//        if ($user['admin'] == 2) { // 超级管理员拥有一切权限
-//            return $handler->handle($request);
-//        }
-//
-//        $authList = $this->recursiveForeach($user['auths']);
-//        // 判断接口权限是否在账户拥有权限数组内
-//        $allowable = in_array($authName, $authList) ? true : false;
-//        if (in_array($authName, $authList)) {
-//            return $handler->handle($request);
-//        }
-//
-//        throw new ForbiddenException();
+        $dispatch = $this->request->getAttribute(Dispatched::class);
+        list($class,$method) = $dispatch->handler->callback;
+        $routeName = AuthInit::makeKey($class, $method);
+        $auth = AuthInit::get($routeName);
+        if (empty($auth)) { // 没有设置权限代表所有用户都可以访问
+            return $handler->handle($request);
+        }
+        $authName = $auth['authName'];
+        $login = $auth['login'];
+
+        if (!$login) { // 接口不需要登录
+            return $handler->handle($request);
+        }
+
+        // 没登录会自动抛异常
+        $uid = $this->token->getCurrentUID();
+        $permission = $this->user->getUserAllPermission($uid);
+        if (in_array($authName, $permission)) {
+            return $handler->handle($request);
+        }
+
+        throw new ForbiddenException();
     }
 
     /**

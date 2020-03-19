@@ -88,19 +88,19 @@ class LinUser extends Model
      * @return array
      * @throws UserException
      */
-    public function getUserInfo($uid) :array
+    public function getUserInfo(int $uid) :array
     {
         $user = $this->getUserById($uid)->setHidden(['create_time', 'update_time', 'delete_time', 'username'])->toArray();
         // 查询用户所有的权限组
         $groupIds = $this->userGroup->query()->where('user_id', $user['id'])->get()->pluck('group_id')->toArray();
-        $superAdmin = $this->group->query()->whereIn('id', $groupIds)->where('name', 'admin')->first()->toArray();
+        $superAdmin = $this->group->query()->whereIn('id', $groupIds)->where('name', 'admin')->first();
         $permissions = [];
         if (!empty($superAdmin)) { // 该用户拥有超级管理员的权限（直接查询所有权限返回）
             $user['admin'] = true;
             $permissions = $this->permissions->query()->get()->toArray();
         } else { //不是则要先查询出这些分组下有多少权限id
             $user['admin'] = false;
-            $permissionIds = $this->groupPermission->query()->whereIn('group_id', $groupIds)->get()->pluck('pluck')->toArray();
+            $permissionIds = $this->groupPermission->query()->whereIn('group_id', $groupIds)->get()->pluck('permission_id');
             if (!empty($permissionIds)) {
                 $permissions = $this->permissions->query()->whereIn('id', $permissionIds)->get()->toArray();
             }
@@ -110,6 +110,31 @@ class LinUser extends Model
 
         return $user;
     }
+
+    /**
+     * 获取权限列表
+     *
+     * @param int $uid
+     *
+     * @return array
+     * @throws UserException
+     */
+    public function getUserAllPermission(int $uid) :array
+    {
+        $userInfo = $this->getUserInfo($uid);
+        $permissions = [];
+        if (!empty($userInfo['permissions'])) {
+            foreach ($userInfo['permissions'] as $v) {
+                foreach ($v as $key => $value) {
+                    foreach ($value as $item) {
+                        $permissions[] = $item['permission'];
+                    }
+                }
+            }
+        }
+        return array_unique($permissions);
+    }
+
 
     /**
      * 通过user_id 获取数据
