@@ -16,12 +16,9 @@ class CreateLinUsersTable extends Migration
             $table->string('nickname',20)->nullable(false)->default("")->comment("昵称");
             $table->string('username',20)->nullable(false)->comment("用户名")->unique();
             $table->string('avatar',255)->nullable(false)->default("")->comment("头像url");
-            $table->tinyInteger('admin')->default(0)->comment("是否是超级管理员");
-            $table->tinyInteger('active')->default(1)->comment("是否是激活状态");
             $table->string("email",255)->nullable(false)->default("")->comment("邮箱地址")->unique();
-            $table->bigInteger("group_id")->nullable(false)->default(0)->comment("用户组（关联group表主键），超级管理员为0");
-            $table->string('password',100)->nullable(false)->comment("密码");
-            $table->timestamps();
+            $table->dateTime('create_time');
+            $table->dateTime('update_time');
         });
     }
 

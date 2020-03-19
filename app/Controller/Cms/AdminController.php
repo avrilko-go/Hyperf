@@ -6,6 +6,7 @@ namespace App\Controller\Cms;
 
 use App\Annotation\Auth;
 use App\Controller\AbstractController;
+use App\Exception\Cms\UserException;
 use App\Init\AuthInit;
 use App\Model\Cms\LinGroup;
 use App\Model\Cms\LinGroupPermission;
@@ -73,7 +74,7 @@ class AdminController extends AbstractController
      */
     public function getGroupAll()
     {
-        return $this->group->all();
+        return $this->group->query()->where('name', '<>', LinGroup::ADMIN_GROUP_NAME )->get();
     }
 
     /**
@@ -198,6 +199,14 @@ class AdminController extends AbstractController
      */
     public function deleteUser(int $id)
     {
+        if ($id === 1) {
+            throw new UserException([
+                'code' => 400,
+                'errorCode' => 11000,
+                'msg' => '管理员不能删除'
+            ]);
+        }
+
         $this->userGroup->query()->where('user_id',$id)->delete();
         $this->log->query()->where('user_id',$id)->delete();
         $this->userIdentity->query()->where('user_id',$id)->delete();

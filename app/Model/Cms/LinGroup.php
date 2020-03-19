@@ -13,6 +13,11 @@ use Hyperf\Di\Annotation\Inject;
 class LinGroup extends Model
 {
     /**
+     * admin的组名
+     */
+    const ADMIN_GROUP_NAME = 'admin';
+
+    /**
      * The table associated with the model.
      *
      * @var string

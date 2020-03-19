@@ -96,7 +96,7 @@ class LinUser extends Model
         $user = $this->getUserById($uid)->setHidden(['create_time', 'update_time', 'delete_time', 'username'])->toArray();
         // 查询用户所有的权限组
         $groupIds = $this->userGroup->query()->where('user_id', $user['id'])->get()->pluck('group_id')->toArray();
-        $superAdmin = $this->group->query()->whereIn('id', $groupIds)->where('name', 'admin')->first();
+        $superAdmin = $this->group->query()->whereIn('id', $groupIds)->where('name', LinGroup::ADMIN_GROUP_NAME)->first();
         $permissions = [];
         if (!empty($superAdmin)) { // 该用户拥有超级管理员的权限（直接查询所有权限返回）
             $user['admin'] = true;
