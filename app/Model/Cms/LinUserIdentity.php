@@ -6,6 +6,7 @@ namespace App\Model\Cms;
 
 use App\Exception\Cms\UserException;
 use App\Model\Model;
+use App\Service\TokenService;
 use Hyperf\Database\Model\ModelNotFoundException;
 use Hyperf\Di\Annotation\Inject;
 
@@ -44,6 +45,12 @@ class LinUserIdentity extends Model
      * @var LinUser
      */
     private $user;
+
+    /**
+     * @Inject()
+     * @var TokenService
+     */
+    private $token;
 
     const CREATED_AT = 'create_time';
 
@@ -114,4 +121,18 @@ class LinUserIdentity extends Model
         return md5($rawPassword.config('mode.app_key')) === $password;
     }
 
+    /**
+     * 修改登陆密码
+     *
+     * @param string $password
+     *
+     * @throws \App\Exception\Cms\TokenException
+     */
+    public function changePassword(string $password)
+    {
+        $userId = $this->token->getCurrentUID();
+        $this->query()->where(['user_id' => $userId, 'identity_type' => self::TYPE_LOGIN_USERNAME])->update([
+            'credential' => md5($password. config('mode.app_key'))
+        ]);
+    }
 }

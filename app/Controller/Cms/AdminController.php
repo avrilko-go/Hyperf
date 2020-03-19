@@ -12,6 +12,7 @@ use App\Model\Cms\LinGroupPermission;
 use App\Model\Cms\LinLog;
 use App\Model\Cms\LinUser;
 use App\Model\Cms\LinUserGroup;
+use App\Model\Cms\LinUserIdentity;
 use App\Request\Cms\UserRequest;
 use App\Service\TokenService;
 use Hyperf\Di\Annotation\Inject;
@@ -21,7 +22,9 @@ use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\PostMapping;
+use Hyperf\HttpServer\Annotation\PutMapping;
 use Hyperf\HttpServer\Contract\ResponseInterface;
+use TheSeer\Tokenizer\Token;
 
 /**
  * @Controller(prefix="/cms/admin")
@@ -45,6 +48,24 @@ class AdminController extends AbstractController
      * @var LinUserGroup
      */
     private $userGroup;
+
+    /**
+     * @Inject()
+     * @var LinUser
+     */
+    private $user;
+
+    /**
+     * @Inject()
+     * @var LinLog
+     */
+    private $log;
+
+    /**
+     * @Inject()
+     * @var LinUserIdentity
+     */
+    private $userIdentity;
 
     /**
      * @GetMapping(path="group/all")
@@ -146,6 +167,52 @@ class AdminController extends AbstractController
      */
     public function users()
     {
+        return $this->user->getUserList($this->request->all());
+    }
 
+    /**
+     * @PutMapping(path="user/{id}")
+     */
+    public function storeUser(int $id)
+    {
+        $this->user->storeUser($id,$this->request->all());
+
+        return [
+            'code' => 9,
+            'message' => '修改信息成功',
+            'request' => $this->request->getMethod(). " ".$this->request->getPathInfo()
+        ];
+    }
+
+    /**
+     * @DeleteMapping(path="user/{id}")
+     */
+    public function deleteUser(int $id)
+    {
+        $this->userGroup->query()->where('user_id',$id)->delete();
+        $this->log->query()->where('user_id',$id)->delete();
+        $this->userIdentity->query()->where('user_id',$id)->delete();
+        $this->user->query()->where('id',$id)->delete();
+
+        return [
+            'code' => 6,
+            'message' => '移除用户成功',
+            'request' => $this->request->getMethod(). " ".$this->request->getPathInfo()
+        ];
+    }
+
+    /**
+     * @PutMapping(path="user/{id}/password")
+     */
+    public function password()
+    {
+        $password = $this->request->input('new_password');
+        $this->userIdentity->changePassword($password);
+
+        return [
+            'code' => 9,
+            'message' => '修改登陆密码成功',
+            'request' => $this->request->getMethod(). " ".$this->request->getPathInfo()
+        ];
     }
 }

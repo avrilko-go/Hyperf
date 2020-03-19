@@ -159,4 +159,78 @@ class LinUser extends Model
             }
         }
     }
+
+    /**
+     * 获取用户列表
+     *
+     * @param array $params
+     *
+     * @return array
+     * @throws \App\Exception\Cms\ParameterException
+     */
+    public function getUserList(array $params)
+    {
+        $users = $this->query();
+        if (isset($params['group_id']) && $params['group_id'] > 0) {
+            $userIds = $this->userGroup->query()->where('group_id', $params['group_id'])->get()->pluck('user_id');
+            if (!empty($userIds)) {
+                $users = $users->whereIn('id', $userIds);
+            }
+        }
+
+        list($start, $count) = $this->paginate();
+
+        $totalNums = $users->count();
+        $users = $users->offset($start)->limit($count)->orderByDesc('create_time')->get()->toArray();
+
+        foreach ($users as $key => $user) { // 这里在数据库循环查数据很sb，为了适配这个数据库结构
+            $user['groups'] = [];
+            $groupIds = $this->userGroup->query()->where('user_id', $user['id'])->get()->pluck('group_id');
+            if (!empty($groupIds)) {
+                $groupInfo = $this->group->query()->whereIn('id', $groupIds)->get()->toArray();
+                $user['groups'] = $groupInfo;
+            }
+            $users[$key] = $user;
+        }
+
+        $result = [
+            'items' => $users,
+            'total' => $totalNums,
+            'count' => $count,
+            'page' => $this->request->query('page'),
+            'total_page' => ceil($totalNums / $count)
+        ];
+        return $result;
+    }
+
+    /**
+     * 保存用户信息
+     *
+     * @param int $id
+     * @param array $params
+     *
+     * @throws UserException
+     */
+    public function storeUser(int $id, array $params)
+    {
+        $email = (string)$params['email'];
+        $group_ids = $params['group_ids'];
+        $user = $this->getUserById($id);
+        if ($user->email !== $email) {
+            throw new UserException([
+                "code"=> 404,
+                'msg' => '邮箱不匹配',
+            ]);
+        }
+
+        $this->userGroup->query()->where('user_id', $id)->delete();
+        foreach ($group_ids as $group_id) {
+            $insertData = [
+                'user_id' => $id,
+                'group_id' => $group_id
+            ];
+            $this->userGroup->query()->create($insertData);
+        }
+    }
+
 }
