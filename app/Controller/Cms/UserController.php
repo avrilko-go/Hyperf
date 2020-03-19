@@ -66,7 +66,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Auth(auth="获取自己的权限信息",login=true,hidden=true,module="必备开启权限")
+     * @Auth(auth="获取自己的权限信息",login=true,hidden=true,module="必备")
      * @GetMapping(path="permissions")
      */
     public function getAllowedApis()
@@ -90,7 +90,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Auth(auth="刷新授权",hidden=true,module="必备开启权限")
+     * @Auth(auth="刷新授权",hidden=true,module="必备")
      * @GetMapping(path="refresh")
      */
     public function refresh()

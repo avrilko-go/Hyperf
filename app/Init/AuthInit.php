@@ -100,9 +100,11 @@ class AuthInit
     {
         $map = self::getAuth();
         foreach ($map as $key => $item) {
-            $id = LinPermission::addData($item);
-            $item['id'] = $id;
-            $map[$key] = $item;
+            if (empty($item['hidden'])) {
+                $id = LinPermission::addData($item);
+                $item['id'] = $id;
+                $map[$key] = $item;
+            }
         }
 
         self::$authMap = $map;

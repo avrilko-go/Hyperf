@@ -73,7 +73,6 @@ class UserLogListener implements ListenerInterface
             $message = $data;
         }
 
-        var_dump($data);
         $insertData = [
             'message' => $username . $message,
             'user_id' => $uid,

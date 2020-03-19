@@ -66,13 +66,17 @@ class BackendAuthMiddleware implements MiddlewareInterface
         }
         $authName = $auth['authName'];
         $login = $auth['login'];
+        $moduleName = $auth['moduleName'];
 
         if (!$login) { // 接口不需要登录
             return $handler->handle($request);
         }
-
         // 没登录会自动抛异常
         $uid = $this->token->getCurrentUID();
+        if ($moduleName === "必备") {
+            return $handler->handle($request);
+        }
+
         $permission = $this->user->getUserAllPermission($uid);
         if (in_array($authName, $permission)) {
             return $handler->handle($request);
@@ -81,25 +85,4 @@ class BackendAuthMiddleware implements MiddlewareInterface
         throw new ForbiddenException();
     }
 
-    /**
-     * 递归遍历用户权限字段的数组
-     * @param $array
-     *
-     * @return array
-     */
-    protected function recursiveForeach($array) :array
-    {
-        static $authList = [];
-        if (!is_array($array)) {
-            return $authList;
-        }
-        foreach ($array as $key => $val) {
-            if (is_array($val) && !isset($val['auth'])) {
-                $this->recursiveForeach($val);
-            } else {
-                array_push($authList, $val['auth']);
-            }
-        }
-        return $authList;
-    }
 }

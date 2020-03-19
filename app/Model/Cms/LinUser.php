@@ -6,6 +6,7 @@ namespace App\Model\Cms;
 
 use App\Exception\Cms\TokenException;
 use App\Exception\Cms\UserException;
+use App\Init\AuthInit;
 use App\Model\Model;
 use App\Service\TokenService;
 use Hyperf\Di\Annotation\Inject;
@@ -99,7 +100,13 @@ class LinUser extends Model
         $permissions = [];
         if (!empty($superAdmin)) { // 该用户拥有超级管理员的权限（直接查询所有权限返回）
             $user['admin'] = true;
-            $permissions = $this->permissions->query()->get()->toArray();
+            $allAuth = AuthInit::getAuth();
+            foreach ($allAuth as $value) {
+                $permissions[] = [
+                    'module' => $value['moduleName'],
+                    'name' => $value['authName']
+                ];
+            }
         } else { //不是则要先查询出这些分组下有多少权限id
             $user['admin'] = false;
             $permissionIds = $this->groupPermission->query()->whereIn('group_id', $groupIds)->get()->pluck('permission_id');

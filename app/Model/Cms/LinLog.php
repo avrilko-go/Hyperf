@@ -6,6 +6,7 @@ namespace App\Model\Cms;
 
 
 use App\Model\Model;
+use Hyperf\Di\Annotation\Inject;
 
 class LinLog extends Model
 {
@@ -36,6 +37,12 @@ class LinLog extends Model
      * @var array
      */
     protected $casts = [];
+
+    /**
+     * @Inject()
+     * @var LinUser
+     */
+    private $user;
 
     const CREATED_AT = 'create_time';
 
@@ -90,19 +97,14 @@ class LinLog extends Model
      */
     public function getUsers($params) :array
     {
-        list($start, $count) = $this->paginate();
-
-        $logs = $this->query()->select(['username']);
-
-        $totalNums = $logs->count();
-        $logs = $logs->offset($start)->limit($count)->get()->unique()->pluck('username');
+        $user = $this->user->query()->get()->pluck('username')->unique();
 
         $result = [
-            'items' => $logs,
-            'total' => $totalNums,
-            'count' => $count,
+            'items' => $user,
+            'total' => $user->count(),
+            'count' => $user->count(),
             'page' => $this->request->query('page'),
-            'total_page' => ceil($totalNums / $count)
+            'total_page' =>  1
         ];
         return $result;
     }
