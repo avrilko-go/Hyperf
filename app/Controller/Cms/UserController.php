@@ -89,4 +89,13 @@ class UserController extends AbstractController
         ];
     }
 
+    /**
+     * @Auth(auth="刷新授权",hidden=true,module="必备开启权限")
+     * @GetMapping(path="refresh")
+     */
+    public function refresh()
+    {
+        return $this->token->refreshToken();
+    }
+
 }

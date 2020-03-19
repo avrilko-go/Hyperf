@@ -7,6 +7,7 @@ namespace App\Service;
 
 
 use App\Exception\Cms\TokenException;
+use App\Exception\Cms\UserException;
 use App\Model\Cms\LinUser;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
@@ -141,7 +142,7 @@ class TokenService
         } catch (ExpiredException $e) {  // token过期
             throw new TokenException(['msg' => '令牌已过期，刷新浏览器重试', 'error_code' => 10050]);
         } catch (\Exception $e) {  //其他错误
-            throw new \Exception($e->getMessage());
+            throw new TokenException(['msg' => $e->getMessage()]);
         }
         if (array_key_exists($key, $jwt['user'])) {
             return $jwt['user']->$key;
@@ -149,5 +150,30 @@ class TokenService
             throw new TokenException(['msg' => '尝试获取的Token变量不存在']);
         }
     }
+
+    /**
+     * 刷新授权
+     *
+     * @return array
+     * @throws TokenException
+     * @throws UserException
+     */
+    public function refreshToken()
+    {
+        try {
+            $uid = $this->getCurrentTokenVar('id', 'app_refresh_token');
+        } catch (\Exception $exception) {
+            throw new TokenException([
+                'errorCode' => 10000,
+                'msg' => $exception->getMessage()
+            ]);
+        }
+
+        $user = $this->user->getUserById($uid);
+        return [
+            'access_token' => $this->createAccessToken($user)
+        ];
+    }
+
 
 }

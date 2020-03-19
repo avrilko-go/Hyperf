@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Model\Cms;
 
+use App\Exception\Cms\TokenException;
 use App\Exception\Cms\UserException;
 use App\Model\Model;
+use App\Service\TokenService;
 use Hyperf\Di\Annotation\Inject;
 
 class LinUser extends Model
@@ -257,5 +259,4 @@ class LinUser extends Model
             $this->userGroup->query()->create($insertData);
         }
     }
-
 }

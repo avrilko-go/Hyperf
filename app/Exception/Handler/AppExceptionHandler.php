@@ -39,8 +39,8 @@ class AppExceptionHandler extends ExceptionHandler
     {
         if ($throwable instanceof BaseException) { // 自定义的异常错误
             $data = [
-                'error_code' => $throwable->errorCode,
-                'msg' => $throwable->msg
+                'code' => $throwable->errorCode,
+                'message' => $throwable->msg
             ];
             $data = json_encode($data, JSON_UNESCAPED_UNICODE); // 不转义中文
             return $response->withStatus($throwable->code)->withHeader("Content-Type","application/json")->withBody(new SwooleStream($data));
@@ -53,8 +53,8 @@ class AppExceptionHandler extends ExceptionHandler
             }
 
             $data = [
-                'error_code' => 20000,
-                'msg' => $msg
+                'code' => 20000,
+                'message' => $msg
             ];
             $data = json_encode($data, JSON_UNESCAPED_UNICODE); // 不转义中文
             return $response->withStatus(400)->withHeader("Content-Type","application/json")->withBody(new SwooleStream($data));
