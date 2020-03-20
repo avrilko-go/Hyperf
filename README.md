@@ -16,7 +16,7 @@
 ```git clone git@github.com:hb475721797/Hyperf.git```
 ### composer安装
 ```cd Hyperf && composer install```
-###配置信息
+### 配置信息
 ```cp .env.example .env```
 
 ### 执行数据库迁移
