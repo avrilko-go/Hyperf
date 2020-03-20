@@ -1,3 +1,40 @@
+<h1 align="center">
+  <a href="http://doc.cms.7yue.pro/">
+  <img src="http://doc.cms.7yue.pro/left-logo.png" width="250"/></a>
+  <br>
+  Lin-CMS-Hyperf
+</h1>
+
+<h4 align="center">一个简单易用的CMS后端项目 | <a href="" target="_blank">Lin-CMS-Hyperf</a></h4>
+<blockquote align="center">
+  <em>Lin-CMS-hyperf</em> 使用hyperf适配lin-cms-vue的一个后端服务 
+</blockquote>
+
+## 快速开始 
+
+### 克隆项目
+```git clone git@github.com:hb475721797/Hyperf.git```
+### composer安装
+```cd Hyperf && composer install```
+### 配置信息
+```cp .env.example .env```
+
+### 执行数据库迁移
+```php bin/hyperf.php migrate```
+
+### 进行数据填充
+```php bin/hyperf db:seed```
+
+### 启动
+```php bin.hyperf start```
+
+
+
+
+
+
+
+
 错误码
 
 cms 1开头
