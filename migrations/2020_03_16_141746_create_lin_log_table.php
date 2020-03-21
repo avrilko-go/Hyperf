@@ -19,6 +19,7 @@ class CreateLinLogTable extends Migration
             $table->smallInteger("status_code")->nullable(false)->default(200)->comment("http状态码");
             $table->string("method",20)->nullable(false)->default("GET")->comment("http方法");
             $table->string("path",50)->nullable(false)->default("")->comment("请求的url path");
+            $table->string('params',500)->default("")->comment("所有请求的参数");
             $table->dateTime('create_time');
             $table->dateTime('update_time');
         });

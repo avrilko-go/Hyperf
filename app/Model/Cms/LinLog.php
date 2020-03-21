@@ -29,7 +29,7 @@ class LinLog extends Model
      *
      * @var array
      */
-    protected $fillable = ['message', 'user_id', 'username', 'status_code', 'method', 'path'];
+    protected $fillable = ['message', 'user_id', 'username', 'status_code', 'method', 'path', 'params'];
 
     /**
      * The attributes that should be cast to native types.

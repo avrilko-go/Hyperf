@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Cms;
 
 use App\Annotation\Auth;
+use App\Annotation\Log;
 use App\Controller\AbstractController;
 use App\Exception\Cms\UserException;
 use App\Init\AuthInit;
@@ -119,6 +120,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Log(message="移除组的权限")
      * @Auth(auth="移除组的权限",module="管理员",login=true,hidden=true)
      * @PostMapping(path="permission/remove")
      */
@@ -136,6 +138,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Log(message="添加组权限")
      * @Auth(auth="添加分组信息",module="管理员",login=true,hidden=true)
      * @PostMapping(path="group")
      */
@@ -154,6 +157,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Log(message="删除分组信息")
      * @Auth(auth="删除分组信息",module="管理员",login=true,hidden=true)
      * @DeleteMapping(path="group/{id}")
      */
@@ -179,6 +183,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Log(message="修改了用户信息")
      * @Auth(auth="修改用户信息",module="管理员",login=true,hidden=true)
      * @PutMapping(path="user/{id}")
      */
@@ -194,6 +199,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Log(message="删除用户信息")
      * @Auth(auth="删除用户信息",module="管理员",login=true,hidden=true)
      * @DeleteMapping(path="user/{id}")
      */
@@ -220,6 +226,7 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Log(message="修改了密码")
      * @Auth(auth="修改用户密码",module="管理员",login=true,hidden=true)
      * @PutMapping(path="user/{id}/password")
      */

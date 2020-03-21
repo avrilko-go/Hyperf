@@ -120,6 +120,35 @@ class TokenService
     public function getCurrentTokenVar(string $key, string $tokenType = 'app_access_token')
     {
         $authorization = $this->request->header('authorization');
+        return $this->_getCurrentTokenVar($authorization, $key, $tokenType);
+    }
+
+    /**
+     * 通过传入的方式获取token里面的信息
+     *
+     * @param string $key
+     * @param string $accessToken
+     *
+     * @return mixed
+     * @throws TokenException
+     */
+    public function getCurrentTokenVarByAccessToken(string $key, string $accessToken)
+    {
+        return $this->_getCurrentTokenVar($accessToken, $key, 'app_access_token');
+    }
+
+    /**
+     * 从token中获取信息
+     *
+     * @param string $authorization
+     * @param string $key
+     * @param string $tokenType
+     *
+     * @return mixed
+     * @throws TokenException
+     */
+    private function _getCurrentTokenVar(string $authorization, string $key, string $tokenType)
+    {
         if (!$authorization) {
             throw new TokenException(['msg' => '请求未携带Authorization信息']);
         }
@@ -150,6 +179,7 @@ class TokenService
             throw new TokenException(['msg' => '尝试获取的Token变量不存在']);
         }
     }
+
 
     /**
      * 刷新授权
