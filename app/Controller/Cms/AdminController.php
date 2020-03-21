@@ -7,6 +7,9 @@ namespace App\Controller\Cms;
 use App\Annotation\Auth;
 use App\Annotation\Log;
 use App\Controller\AbstractController;
+use App\Exception\Cms\GroupException;
+use App\Exception\Cms\ParameterException;
+use App\Exception\Cms\TokenException;
 use App\Exception\Cms\UserException;
 use App\Init\AuthInit;
 use App\Model\Cms\LinGroup;
@@ -90,6 +93,7 @@ class AdminController extends AbstractController
     /**
      * @Auth(auth="获取单个分组信息",module="管理员",login=true,hidden=true)
      * @GetMapping(path="group/{id}")
+     * @throws GroupException
      */
     public function groupInfo(int $id)
     {
@@ -176,6 +180,7 @@ class AdminController extends AbstractController
 
     /**
      * @GetMapping(path="users")
+     * @throws ParameterException
      */
     public function users()
     {
@@ -186,6 +191,9 @@ class AdminController extends AbstractController
      * @Log(message="修改了用户信息")
      * @Auth(auth="修改用户信息",module="管理员",login=true,hidden=true)
      * @PutMapping(path="user/{id}")
+     * @param int $id
+     * @return array
+     * @throws UserException
      */
     public function storeUser(int $id)
     {
@@ -202,6 +210,9 @@ class AdminController extends AbstractController
      * @Log(message="删除用户信息")
      * @Auth(auth="删除用户信息",module="管理员",login=true,hidden=true)
      * @DeleteMapping(path="user/{id}")
+     * @param int $id
+     * @return array
+     * @throws UserException
      */
     public function deleteUser(int $id)
     {
@@ -229,6 +240,7 @@ class AdminController extends AbstractController
      * @Log(message="修改了密码")
      * @Auth(auth="修改用户密码",module="管理员",login=true,hidden=true)
      * @PutMapping(path="user/{id}/password")
+     * @throws TokenException
      */
     public function password()
     {

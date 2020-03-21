@@ -55,6 +55,9 @@ class UserController extends AbstractController
     /**
      * @Log(message="登陆获取了令牌")
      * @PostMapping(path="login")
+     * @param UserRequest $request
+     * @return array
+     * @throws \App\Exception\Cms\UserException
      */
     public function login(UserRequest $request)
     {
@@ -67,6 +70,8 @@ class UserController extends AbstractController
     /**
      * @Auth(auth="获取自己的权限信息",login=true,hidden=true,module="必备")
      * @GetMapping(path="permissions")
+     * @throws \App\Exception\Cms\TokenException
+     * @throws \App\Exception\Cms\UserException
      */
     public function getAllowedApis()
     {
